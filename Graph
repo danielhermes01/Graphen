@@ -1,0 +1,90 @@
+import java.util.LinkedList;
+
+public class Graph {
+
+	private LinkedList<Crossroad> crossroads;
+	private int globalId;
+
+	public Graph() {
+		crossroads = new LinkedList<Crossroad>();
+		globalId = 1;
+	}
+	
+	public void addCrossroad() {
+		Crossroad c=new Crossroad(this.globalId);
+		crossroads.add(c);
+		globalId++;
+
+	}
+	
+	public Crossroad findCrossroad(int id) {
+		for(Crossroad c:crossroads) {
+			if(c.getId()==id) {
+				return c;
+			}
+		}
+		return null;
+		
+	}
+
+	public void addOneWayStreet(int startCrossroadId, int targetCrossroadId, int distance) {
+		Crossroad start=findCrossroad(startCrossroadId);
+		Crossroad finish=findCrossroad(targetCrossroadId);
+		if(start==null || finish==null) {
+			return;
+		}
+		OneWayStreet o= new OneWayStreet(finish, distance);
+		start.getOneWayStreets().add(o);
+	}
+
+	public int findOneWayStreet(int startCrossroadId, int targetCrossroadId) {
+		Crossroad start=findCrossroad(startCrossroadId);
+		for(OneWayStreet o:start.getOneWayStreets()) {
+			if(o.getTarget().getId()==targetCrossroadId) {
+				return o.getDistance();
+			}
+		}
+		
+		return -1;
+		
+		
+	}
+
+	public void removeOneWayStreet(int startCrossroadId, int targetCrossroadId) {
+		Crossroad start=findCrossroad(startCrossroadId);
+		if(start ==null) {
+			return;
+		}
+		for(OneWayStreet o:start.getOneWayStreets()) {
+			if(o.getTarget().getId()==targetCrossroadId) {
+				start.getOneWayStreets().remove(o);
+			}
+		}
+	}
+
+
+	public int totalDistance() {
+		int count=0;
+		for(Crossroad c:crossroads) {
+			for(OneWayStreet o:c.getOneWayStreets()) {
+				count+=o.getDistance();
+			}
+		}
+		return count;
+	}
+
+	public String toString() {
+		if (crossroads.isEmpty()) {
+			return "Crossroads im Graphen: []  Der Graph ist leer.";
+		}
+		String result = "Crossroads im Graphen: " + crossroads;
+		for (Crossroad crossroad : crossroads) {
+			for (OneWayStreet oneWayStreet : crossroad.getOneWayStreets()) {
+				result += "\n" + crossroad + " ---> " + oneWayStreet.getTarget() + "   [distance = "
+						+ oneWayStreet.getDistance() + "]";
+			}
+		}
+		return result;
+	}
+
+}
